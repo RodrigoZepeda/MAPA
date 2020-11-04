@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<!-- Developed by Rodrigo Zepeda -->
+<!-- MIT LICENSE
+    Copyright 2020 Rodrigo Zepeda
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+    associated documentation files (the "Software"), to deal in the Software without restriction,
+    including without limitation the rights to use, copy, modify, merge, publish, distribute,
+    sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
+    is furnished to do so, subject to the following conditions:
+    The above copyright notice and this permission notice shall be included in all copies or substantial
+    portions of the Software.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+    DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="theme-color" content="#4285f4">
+    <meta name="description" content="Susceptible Infected Recovered (SIR) interactive model">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="keywords" content="COVID-19, Vaccine, Vaccine Allocation, Susceptible, Infected, Removed, SIR, Epidemiology, Mathematical model, Differential Equations, Mexico">
+    <meta name="author" content="Rodrigo Zepeda Tello">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <!--<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="manifest" href="images/site.webmanifest">
+    <link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#5bbad5">-->
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+
+    <title>MAR-19</title>
+
+    <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="styles/nouislider.min.css">
+
+    <script src="script/d3.min.js"></script> <!-- D3JS V 6.0-->
+    <script src="script/jquery.js"></script> <!-- jQuery v3.5-->
+    <!--<script src="script/jquery-ui.js"></script>  jQuery v3.5-->
+    <script src="script/wNumb.min.js"></script> <!-- https://refreshless.com/wnumb/ -->
+    <script src="script/nouislider.min.js"></script> <!--https://refreshless.com/nouislider/slider-values/-->
+    <!--<script src="script/sir.js"></script> Functions for running sir model-->
+    <script src="script/sliders.js"></script>
+    <!--<script src="script/plot.js"></script> Functions for plotting-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.es.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+
+        .uislider {
+            margin-bottom: 5%;
+            margin-top: 5%;
+            margin-right: 5%;
+            margin-left: 5%;
+        }
+
+        .noUi-connect {
+            background: #373a3c;
+        }
+
+        .pagination{
+            margin-top: 5%;
+        }
+
+
+        #S .noUi-tooltip {
+            color: purple;
+        }
+
+        #I .noUi-tooltip {
+            color: red;
+        }
+
+        #V .noUi-tooltip {
+            color: deepskyblue;
+        }
+
+        .noUi-tooltip {
+            font-size: 70%;
+            opacity: 1;
+            bottom:-32px;
+            background-color: transparent;
+            border-color: transparent;
+            color: darkslategrey;
+            padding: 1%;
+        }
+        .noUi-horizontal .noUi-tooltip  {bottom: -75%;}
+
+        .inner {
+            background-color: blue;
+        }
+
+        .outer {
+            background-color: orange;
+        }
+
+        .center {
+          margin: auto;
+          width: 25%;
+        }
+
+    </style>
+
+    <script>
+    var margin  = {top: 10, right: 10, bottom: 10, left: 10},
+        padding = {top: 30, right: 30, bottom: 60, left: 60},
+        xdomain      = {min: -5, max: 5},
+        ydomain      = {min: 0, max: 0.5},
+        debug        = false;
+    var coverline;
+    //var data_init = {"gaussian": [0,1,2,3,45], "t": [0,1,2,3,45]};
+    var data_init = getData(xdomain);
+
+    function getData(xdomain){
+        var gaussianConstant = 1 / Math.sqrt(2 * Math.PI),
+            data_normal = [],
+            i = -5;
+
+        do {
+
+        data_normal.push({
+            "gaussian": gaussianConstant*Math.exp(- Math.pow(i,2)/2),
+            "gaussian1": gaussianConstant*Math.exp(- Math.pow(i - 2,2)/(2*4)),
+            "gaussian2": gaussianConstant*Math.exp(- Math.pow(i + 1,2)/2),
+            "gaussian3": gaussianConstant*Math.exp(- Math.pow(i - 0.5,2)),
+            "gaussian4": gaussianConstant*Math.exp(- 2*Math.pow(i + 3,2)),
+            "t": i
+        })
+
+        i = i + 0.1
+
+        } while (i < xdomain.max);
+
+        return data_normal;
+
+    }
+
+    function setPlotInit(margin, padding, xdomain, ydomain){
+
+        //Custom heights for d3js plot
+        var outerHeight  = 0.3*Math.max(document.documentElement['clientHeight'], document.body['scrollHeight'], document.documentElement['scrollHeight'], document.body['offsetHeight'], document.documentElement['offsetHeight']);
+            outerWidth   = Math.max(0.975*document.getElementById("canvasplot").clientWidth, 300);
+            innerWidth   = outerWidth - margin.left - margin.right,
+            innerHeight  = outerHeight - margin.top - margin.bottom,
+            width        = innerWidth - padding.left - padding.right,
+            height       = innerHeight - padding.top - padding.bottom;
+
+
+        // Create svg margins
+        var outer = d3.select('#canvasplot').append('svg')
+        .attr('width', outerWidth)
+        .attr('height', outerHeight);
+
+        if(debug){
+            outer.append("rect")
+            .attr("width", innerWidth)
+            .attr("height", innerHeight)
+            .attr('fill', "green")
+        }
+
+        var inner = outer.append("g")
+        .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
+
+        if(debug){
+            inner.append("rect")
+            .attr("width", width)
+            .attr("height", height)
+            .attr('fill', "blue");
+        };
+
+        //X.axis
+        Xscale = d3.scaleLinear()
+        .domain([xdomain.min, xdomain.max])
+        .range([0, width]);
+
+        /*axisX  = inner.append("g")
+            .attr("transform", "translate(" + 0 + "," + height + ")")
+            .attr("id","xaxis")
+            .style("stroke-width", 2)
+            .call(d3.axisBottom(Xscale).tickValues([]));*/
+
+        //Y-axis
+        Yscale = d3.scaleLinear()
+            .domain([-ydomain.min, ydomain.max])
+            .range([height, 0]);
+
+        /*axisY = inner.append("g")
+            .attr("transform", "translate(" + 0 + "," + 0 + ")")
+            .attr("id","yaxis")
+            .style("stroke-width", 2)
+            .call(d3.axisLeft(Yscale));*/
+
+        // define the line
+
+
+        var gline = d3.line()
+            .x(function(d) { return Xscale(d.t); })
+            .y(function(d) { return Yscale(d.gaussian);}) //Controlling for any numerical error
+            .curve(d3.curveMonotoneX);
+
+        var gline1 = d3.line()
+            .x(function(d) { return Xscale(d.t); })
+            .y(function(d) { return Yscale(d.gaussian1);}) //Controlling for any numerical error
+            .curve(d3.curveMonotoneX);
+
+        var gline2 = d3.line()
+            .x(function(d) { return Xscale(d.t); })
+            .y(function(d) { return Yscale(d.gaussian2);}) //Controlling for any numerical error
+            .curve(d3.curveMonotoneX);
+
+        var gline3 = d3.line()
+            .x(function(d) { return Xscale(d.t); })
+            .y(function(d) { return Yscale(d.gaussian3);}) //Controlling for any numerical error
+            .curve(d3.curveMonotoneX);
+
+        var gline4 = d3.line()
+            .x(function(d) { return Xscale(d.t); })
+            .y(function(d) { return Yscale(d.gaussian4);}) //Controlling for any numerical error
+            .curve(d3.curveMonotoneX);
+
+        return {"inner": inner, "gline": gline, "gline1": gline1,
+                "gline2": gline2, "gline3": gline3, "gline4": gline4};
+
+    };
+
+    function setPlotdata(plotparams, mydata){
+
+        gline = plotparams["inner"].append("path")
+        .datum(mydata)
+        .attr("d", plotparams["gline"])
+        .style("stroke", "#9b479f")
+        .style("stroke-width", 3)
+        .style("fill", "none")
+        .attr("transform", null);
+
+        gline1 = plotparams["inner"].append("path")
+        .datum(mydata)
+        .attr("d", plotparams["gline1"])
+        .style("stroke", "#373a3c")
+        .style("stroke-width", 3)
+        .style("fill", "none")
+        .attr("transform", null);
+
+        gline2 = plotparams["inner"].append("path")
+        .datum(mydata)
+        .attr("d", plotparams["gline2"])
+        .style("stroke", "deepskyblue")
+        .style("stroke-width", 3)
+        .style("fill", "none")
+        .attr("transform", null);
+
+        gline3 = plotparams["inner"].append("path")
+        .datum(mydata)
+        .attr("d", plotparams["gline3"])
+        .style("stroke", "#d9831f")
+        .style("stroke-width", 3)
+        .style("fill", "none")
+        .attr("transform", null);
+
+        gline4 = plotparams["inner"].append("path")
+        .datum(mydata)
+        .attr("d", plotparams["gline4"])
+        .style("stroke", "#d9230f")
+        .style("stroke-width", 3)
+        .style("fill", "none")
+        .attr("transform", null);
+    };
+
+    </script>
+
+    <script>
+        poplist = [] //List to write population elements
+        const Item = ({ idnumber }) => `
+        <div class="row" id = "pop${idnumber}">
+          <div class="col-lg-12">
+              <div class="card border-primary mb-3" style="max-width: 100%;">
+                  <div class="card-header">
+                  <p>Población ${idnumber}
+                      <button type="button" onclick="popremove(${idnumber})" class="btn-sm btn-outline-danger float-right"><i class="fa fa-trash"></i></button>
+                  </p>
+                  </div>
+                  <div class="card-body">
+                      <div class="container">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <label class="form-control-label" for="pop_select${idnumber}">Selecciona la población a vacunar</label>
+                                <div class="form-group" id="pop_select${idnumber}">
+                                    <select class="custom-select">
+                                      <option value="" disabled selected hidden>Elige la población</option>
+                                      <option value="casa_ancianos">Adultos mayores en casas de ancianos</option>
+                                      <option value="salud">Trabajadores de la salud</option>
+                                      <option value="indiferente">Toda la población (excepto trabajadores de la salud)</option>
+                                      <option value="pop_ocupada_gral">Población ocupada</option>
+                                      <option value="pop_ocupada_esencial">Población ocupada en sectores esenciales (sin contar trabajadores de la salud)</option>
+                                      <option value="pop_ocupada_no_esencial">Población ocupada en sectores no esenciales (sin contar trabajadores de la salud)</option>
+                                      <option value="pop_no_ocupada">Población no ocupada</option>
+                                      <option value="resto_poblacion">Resto de la población</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="comorbilidad_select${idnumber}">Selecciona la cantidad de comorbilidades a estudiar</label>
+                                <div class="form-group" id="comorbilidad_select$${idnumber}">
+                                    <select class="custom-select">
+                                      <option value="" disabled selected hidden>Elige la cantidad de comorbilidades a analizar</option>
+                                      <option value="indiferente">Con y sin comorbilidades</option>
+                                      <option value="sin_comorbilidad">Sin comorbilidades</option>
+                                      <option value="una_comorbilidad">Una comorbilidad</option>
+                                      <option value="dos_o_mas_comorbilidad">Dos o más comorbilidades</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="edad_select${idnumber}">Selecciona el rango de edad</label>
+                                <div class="form-group" id="edad_select$${idnumber}">
+                                    <select class="custom-select">
+                                      <option value="" disabled selected hidden>Selecciona el rango de edad</option>
+                                      <option value="indiferente">Todos</option>
+                                      <option value="80mas">80 y más</option>
+                                      <option value="70a79">De 70 a 79</option>
+                                      <option value="60a69">De 60 a 69</option>
+                                      <option value="40a49">De 40 a 49</option>
+                                      <option value="50a59">De 50 a 59</option>
+                                      <option value="75a80">75 a 80</option>
+                                      <option value="70a74">70 a 74</option>
+                                      <option value="65a69">65 a 69</option>
+                                      <option value="60a64">60 a 64</option>
+                                      <option value="55a59">55 a 59</option>
+                                      <option value="50a54">50 a 54</option>
+                                      <option value="45a49">45 a 49</option>
+                                      <option value="40a44">40 a 44</option>
+                                      <option value="60ymas">Mayores de 60</option>
+                                      <option value="60ymenos">Menores de 60</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="pop_date_init${idnumber}">Fecha de inicio de la campaña para la primera dosis</label>
+                                <div class="form-group">
+                                    <input class="form-control" id="pop_date_init${idnumber}" name="pop_date_init" placeholder="DD/MM/YYYY" type="text"/>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="pop_date_end${idnumber}">Fecha de final de la campaña para la primera dosis</label>
+                                <div class="form-group">
+                                    <input class="form-control" id="pop_date_end${idnumber}" name="pop_date_end" placeholder="DD/MM/YYYY" type="text"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="pop_date_second_init${idnumber}">Fecha de inicio de la campaña para la segunda dosis</label>
+                                <div class="form-group">
+                                    <input disabled class="form-control disabled" id="pop_date_second_init${idnumber}" name="pop_date_second_init${idnumber}" placeholder="DD/MM/YYYY" type="text"/>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-control-label" for="pop_date_second_end${idnumber}">Fecha de final de la campaña para la segunda dosis</label>
+                                <div class="form-group disabled">
+                                    <input disabled class="form-control" id="pop_date_second_end${idnumber}" name="pop_date_second_end${idnumber}" placeholder="DD/MM/YYYY" type="text"/>
+                                </div>
+                            </div>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+        `;
+    </script>
+
+    <script>
+
+    var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
+    var options = {
+        format: 'dd/mm/yyyy',
+        container:  container,
+        todayHighlight: true,
+        autoclose: true,
+        language: 'es',
+        orientation: "bottom left",
+    };
+
+    // select
+    function popappend(idnumber){
+
+        $('#poblaciones').append([
+          { idnumber: idnumber},
+        ].map(Item));
+        poplist.push(idnumber);
+
+        //Date init and end
+        var date_input_init=$('#pop_date_init' + idnumber); //our date input has the name "date"
+        var date_input_end=$('#pop_date_end' + idnumber); //our date input has the name "date"
+
+        date_input_init.datepicker(options);
+        date_input_end.datepicker(options);
+        //$("#poblaciones").append(clone)
+    }
+
+    function popremove(popelement){
+        $('#pop' + popelement).remove();
+        const index = poplist.indexOf(popelement);
+        if (index > -1) {
+          poplist.splice(index, 1);
+        }
+    }
+
+    //Functon to show divs from the nav menu
+    function show_div(toShow)
+    {
+         $('.navbar-content').not('#' + toShow).hide();
+         $('.nav-item').not('#' + toShow + "_tab").removeClass("active");
+         $('#' + toShow).show();
+         $('#' + toShow + "_tab").addClass("active");
+    }
+
+    $( document ).ready(function() {
+        var countpanels = 1;
+        show_div("intro");
+        setsliders(Initial_Values, Ranges, suffixes);
+
+        //Date picker
+        var date_input=$('input[name="datemax"]'); //our date input has the name "date"
+
+        date_input.datepicker(options);
+        date_input.datepicker("setDate", "31/12/2021");
+
+        $("#addpop").click(function () {
+          popappend(countpanels)
+
+          countpanels = countpanels + 1;
+        });
+
+
+
+
+        //Plot
+        var plotparams = setPlotInit(margin, padding, xdomain, ydomain);
+
+        //Initial plot
+        setPlotdata(plotparams, data_init);
+
+
+    });
+
+    /* Toggle between showing and hiding the navigation menu links when the user clicks on the hamburger menu / bar icon */
+    function showlinks() {
+      var x = document.getElementById("navbar");
+      if (x.style.display === "block") {
+        x.style.display = "none";
+      } else {
+        x.style.display = "block";
+      }
+    }
+    </script>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#intro" onclick="show_div('intro');"><strong>MAPA-Vacunación</strong></a>
+        <a href="javascript:void(0);" class="icon" onclick="showlinks()">
+          <i class="fa fa-bars"></i>
+        </a>
+        <div class="collapse navbar-collapse" id="navbar">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item" id = "caracteristicas_tab">
+                <a class="nav-link" href="#caracteristicas" onclick="show_div('caracteristicas');">Características</a>
+              </li>
+              <li class="nav-item" id = "estrategia_tab">
+                <a class="nav-link" href="#estrategia" onclick="show_div('estrategia');">Estrategia</a>
+              </li>
+              <li class="nav-item" id = "avanzado_tab">
+                <a class="nav-link" href="#avanzado" onclick="show_div('avanzado');">Avanzado</a>
+              </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="jumbotron navbar-content" style="height:100vh;" id = "intro">
+        <h1 class="display-3">MAPa-Vacunas COVID</h1>
+        <p class="lead"><strong>M</strong>odelo de <strong>A</strong>signación <strong>P</strong>rioritari<strong>a</strong> de <strong>Vacuna</strong>s para la COVID-19</p>
+        <hr class="my-4">
+        <div class="card-body" id = "canvasplot" style="margin-bottom: 0%;"></div>
+        <hr class="my-4">
+        <div class="container">
+          <div class="row justify-content-center">
+              <p class="lead">
+                  <a class="btn btn-primary btn-lg" href="#caracteristicas" role="button" onclick="show_div('caracteristicas');">Comenzar</a>
+              </p>
+          </div>
+      </div>
+    </div>
+    <div class="card navbar-content" id = "caracteristicas">
+      <div class="card-header">
+        <h5>Características de la vacuna</h5>
+      </div>
+      <div class="card-body">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-3">
+                <div class="card h-100 input-card border-light mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Dosis</div>
+                    <div class="card-body">
+                      <p class="card-text">Cantidad de aplicaciones necesarias para la vacuna.</p>
+                      <div id="dosis" class = "uislider"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 input-card border-light mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Reducción en mortalidad</div>
+                    <div class="card-body">
+                      <p class="card-text">Porcentaje de reducción en defunciones por COVID-19.</p>
+                      <div id="pdefun" class = "uislider"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 input-card border-light mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Reducción en hospitalizaciones</div>
+                    <div class="card-body">
+                      <p class="card-text">Porcentaje de reducción en hospitalizaciones por COVID-19.</p>
+                      <div id="phosp" class = "uislider"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 input-card border-light mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Reducción en infecciosidad</div>
+                    <div class="card-body">
+                      <p class="card-text">Porcentaje de reducción en la tasa de infección de COVID-19</p>
+                      <div id="pinfect" class = "uislider"></div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class = "row">
+            <div class="offset-lg-4 col-lg-4">
+              <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                  <a class="page-link" href="#intro">&laquo;</a>
+                </li>
+                <li class="page-item active">
+                  <a class="page-link" href="#caracteristicas">Características</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#estrategia" onclick="show_div('estrategia');">Estrategia</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#avanzado" onclick="show_div('avanzado');">Avanzado</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#estrategia" onclick="show_div('estrategia');">&raquo;</a>
+                </li>
+              </ul>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="card navbar-content" id = "estrategia">
+      <div class="card-header">
+        <h5>Estrategias de vacunación</h5>
+      </div>
+      <div class="card-body">
+        <div class="container">
+            <div class = "row">
+                <div class="col-lg-12">
+                    <div class="card border-light mb-3" style="max-width: 100%;">
+                        <div class="card-header">Estrategias predefinidas</div>
+                        <div class="card-body">
+                            <div class="container">
+                              <div class="row">
+                                  <div class="col-lg-12">
+                                      <label class="form-control-label" for="pop_select">Selecciona una estrategia de acción</label>
+                                      <div class="form-group" id="strategy_select">
+                                          <select class="custom-select">
+                                            <option value="" disabled selected hidden>Elige una estrategia</option>
+                                            <option value="1">Criterios de Reino Unido</option>
+                                            <option value="2">Reducción de la mortalidad</option>
+                                            <option value="3">Protección de la población ocupada</option>
+                                            <option value="4">Otra (definir)</option>
+                                          </select>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div id = "poblaciones">
+
+          </div>
+
+          </div>
+
+          <div class="container">
+            <div class="jumbotron border-light" style="border: 1px; border-style: solid;">
+                <div class = "row">
+                    <div class="offset-lg-4 col-lg-4">
+                        <button type="button" class="btn btn-primary btn-lg btn-block" id = "addpop">Agregar población</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class = "row">
+            <div class="offset-lg-4 col-lg-4">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item">
+                    <a class="page-link" href="#caracteristicas" onclick="show_div('caracteristicas');">&laquo;</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#caracteristicas" onclick="show_div('caracteristicas');">Características</a>
+                  </li>
+                  <li class="page-item active">
+                    <a class="page-link" href="#estrategia">Estrategia</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#avanzado" onclick="show_div('avanzado');">Avanzado</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#avanzado" onclick="show_div('avanzado');">&raquo;</a>
+                  </li>
+                </ul>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="card navbar-content" id = "avanzado">
+      <div class="card-header">
+        <h5>Opciones avanzadas del modelo</h5>
+      </div>
+      <div class="card-body">
+        <div class="container">
+            <div class="row">
+                <div class="offset-lg-3 col-lg-3">
+                    <div class="card input-card h-100 border-light mb-3" style="max-width: 20rem;">
+                        <div class="card-header">Tamaño del salto</div>
+                        <div class="card-body">
+                          <p class="card-text">dt para Rungue-Kutta-4</p>
+                          <div id="dt" class = "uislider"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="card input-card h-100 border-light mb-3" style="max-width: 20rem;">
+                        <div class="card-header">Fecha máxima de la simulación</div>
+                        <div class="card-body">
+                            <p class="card-text">Duración máxima del modelo</p>
+                            <div class="form-group"> <!-- Date input -->
+                                <input class="form-control" id="datemax" name="datemax" placeholder="DD/MM/YYYY" type="text"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class = "row">
+            <div class="offset-lg-4 col-lg-4">
+              <ul class="pagination justify-content-center">
+                <li class="page-item">
+                  <a class="page-link" href="#estrategia" onclick="show_div('estrategia');">&laquo;</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#caracteristicas" onclick="show_div('caracteristicas');">Características</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#estrategia" onclick="show_div('estrategia');">Estrategia</a>
+                </li>
+                <li class="page-item active">
+                  <a class="page-link" href="#avanzado">Avanzado</a>
+                </li>
+                <li class="page-item disabled">
+                  <a class="page-link" href="#avanzado">&raquo;</a>
+                </li>
+              </ul>
+            </div>
+        </div>
+      </div>
+    </div>
+</body>
+
+</html>
