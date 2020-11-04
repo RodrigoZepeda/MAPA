@@ -33,7 +33,7 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
 
-    <title>MAR-19</title>
+    <title>MAPa-Vacunación</title>
 
     <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="styles/nouislider.min.css">
@@ -275,7 +275,176 @@
     </script>
 
     <script>
-        poplist = [] //List to write population elements
+    function clean_all_pop(){
+        do {
+            popremove(poplist.pop());
+        } while (poplist.length > 0);
+        countpanels = 1;
+    }
+
+    function nthappend(n){
+        var j = 1;
+        do {
+            popappend(j);
+            j = j + 1;
+        } while (j <= n);
+    }
+
+    //Estrategia UK
+    function UK_strategy(){
+
+        //Clear all
+        clean_all_pop();
+
+        //Click several times
+        nthappend(13);
+
+        $('#pop_select1 option[value="casa_ancianos"]').attr("selected", "selected");
+        $('#comorbilidad_select1 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select1 option[value="indiferente"]').attr("selected", "selected");
+
+        $('#pop_select2 option[value="salud"]').attr("selected", "selected");
+        $('#comorbilidad_select2 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select2 option[value="indiferente"]').attr("selected", "selected");
+
+        $('#pop_select3 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select3 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select3 option[value="80mas"]').attr("selected", "selected");
+
+        $('#pop_select4 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select4 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select4 option[value="75a79"]').attr("selected", "selected");
+
+        $('#pop_select5 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select5 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select5 option[value="70a74"]').attr("selected", "selected");
+
+        $('#pop_select6 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select6 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select6 option[value="65a69"]').attr("selected", "selected");
+
+        $('#pop_select7 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select7 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select7 option[value="60a65"]').attr("selected", "selected");
+
+        $('#pop_select8 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select8 option[value="dos_o_mas_comorbilidad"]').attr("selected", "selected");
+        $('#edad_select8 option[value="20a59"]').attr("selected", "selected");
+
+        $('#pop_select9 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select9 option[value="una_comorbilidad"]').attr("selected", "selected");
+        $('#edad_select9 option[value="20a59"]').attr("selected", "selected");
+
+        $('#pop_select10 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select10 option[value="sin_comorbilidad"]').attr("selected", "selected");
+        $('#edad_select10 option[value="55a59"]').attr("selected", "selected");
+
+        $('#pop_select11 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select11 option[value="sin_comorbilidad"]').attr("selected", "selected");
+        $('#edad_select11 option[value="50a54"]').attr("selected", "selected");
+
+        $('#pop_select12 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select12 option[value="sin_comorbilidad"]').attr("selected", "selected");
+        $('#edad_select12 option[value="45a49"]').attr("selected", "selected");
+
+        $('#pop_select13 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select13 option[value="sin_comorbilidad"]').attr("selected", "selected");
+        $('#edad_select13 option[value="45ymenos"]').attr("selected", "selected");
+
+    }
+
+    //Estrategia mortalidad
+    function mortalidad_strategy(){
+
+        //Clear all
+        clean_all_pop();
+
+        //Click several times
+        nthappend(7);
+
+        $('#pop_select1 option[value="salud"]').attr("selected", "selected");
+        $('#comorbilidad_select1 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select1 option[value="indiferente"]').attr("selected", "selected");
+
+        $('#pop_select2 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select2 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select2 option[value="80mas"]').attr("selected", "selected");
+
+        $('#pop_select3 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select3 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select3 option[value="70a79"]').attr("selected", "selected");
+
+        $('#pop_select4 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select4 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select4 option[value="60a69"]').attr("selected", "selected");
+
+        $('#pop_select5 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select5 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select5 option[value="50a59"]').attr("selected", "selected");
+
+        $('#pop_select6 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select6 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select6 option[value="40a49"]').attr("selected", "selected");
+
+        $('#pop_select7 option[value="indiferente"]').attr("selected", "selected");
+        $('#comorbilidad_select7 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select7 option[value="40ymenos"]').attr("selected", "selected");
+
+
+    }
+
+    //Estrategia población ocupada
+    function ocupada_strategy(){
+
+        //Clear all
+        clean_all_pop();
+
+        //Click several times
+        nthappend(9);
+
+        $('#pop_select1 option[value="salud"]').attr("selected", "selected");
+        $('#comorbilidad_select1 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select1 option[value="indiferente"]').attr("selected", "selected");
+
+        $('#pop_select2 option[value="pop_ocupada_gral"]').attr("selected", "selected");
+        $('#comorbilidad_select2 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select2 option[value="60ymas"]').attr("selected", "selected");
+
+        $('#pop_select3 option[value="pop_ocupada_esencial"]').attr("selected", "selected");
+        $('#comorbilidad_select3 option[value="dos_o_mas_comorbilidad"]').attr("selected", "selected");
+        $('#edad_select3 option[value="60ymenos"]').attr("selected", "selected");
+
+        $('#pop_select4 option[value="pop_ocupada_esencial"]').attr("selected", "selected");
+        $('#comorbilidad_select4 option[value="una_comorbilidad"]').attr("selected", "selected");
+        $('#edad_select4 option[value="60ymenos"]').attr("selected", "selected");
+
+        $('#pop_select5 option[value="pop_ocupada_esencial"]').attr("selected", "selected");
+        $('#comorbilidad_select5 option[value="sin_comorbilidad"]').attr("selected", "selected");
+        $('#edad_select5 option[value="60ymenos"]').attr("selected", "selected");
+
+        $('#pop_select6 option[value="pop_ocupada_no_esencial"]').attr("selected", "selected");
+        $('#comorbilidad_select6 option[value="dos_o_mas_comorbilidad"]').attr("selected", "selected");
+        $('#edad_select6 option[value="60ymenos"]').attr("selected", "selected");
+
+        $('#pop_select7 option[value="pop_ocupada_no_esencial"]').attr("selected", "selected");
+        $('#comorbilidad_select7 option[value="una_comorbilidad"]').attr("selected", "selected");
+        $('#edad_select7 option[value="60ymenos"]').attr("selected", "selected");
+
+        $('#pop_select8 option[value="pop_ocupada_no_esencial"]').attr("selected", "selected");
+        $('#comorbilidad_select8 option[value="sin_comorbilidad"]').attr("selected", "selected");
+        $('#edad_select8 option[value="60ymenos"]').attr("selected", "selected");
+
+        $('#pop_select9 option[value="pop_no_ocupada"]').attr("selected", "selected");
+        $('#comorbilidad_select9 option[value="indiferente"]').attr("selected", "selected");
+        $('#edad_select9 option[value="indiferente"]').attr("selected", "selected");
+
+
+    }
+    </script>
+
+    <script>
+        var poplist = [] //List to write population elements
+        var countpanels = 1;
         const Item = ({ idnumber }) => `
         <div class="row" id = "pop${idnumber}">
           <div class="col-lg-12">
@@ -295,20 +464,19 @@
                                       <option value="" disabled selected hidden>Elige la población</option>
                                       <option value="casa_ancianos">Adultos mayores en casas de ancianos</option>
                                       <option value="salud">Trabajadores de la salud</option>
-                                      <option value="indiferente">Toda la población (excepto trabajadores de la salud)</option>
+                                      <option value="indiferente">Población general (excepto trabajadores de la salud)</option>
                                       <option value="pop_ocupada_gral">Población ocupada</option>
                                       <option value="pop_ocupada_esencial">Población ocupada en sectores esenciales (sin contar trabajadores de la salud)</option>
                                       <option value="pop_ocupada_no_esencial">Población ocupada en sectores no esenciales (sin contar trabajadores de la salud)</option>
                                       <option value="pop_no_ocupada">Población no ocupada</option>
-                                      <option value="resto_poblacion">Resto de la población</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-6">
-                                <label class="form-control-label" for="comorbilidad_select${idnumber}">Selecciona la cantidad de comorbilidades a estudiar</label>
-                                <div class="form-group" id="comorbilidad_select$${idnumber}">
+                                <label class="form-control-label" for="comorbilidad_select${idnumber}">Cantidad de comorbilidades</label>
+                                <div class="form-group" id="comorbilidad_select${idnumber}">
                                     <select class="custom-select">
                                       <option value="" disabled selected hidden>Elige la cantidad de comorbilidades a analizar</option>
                                       <option value="indiferente">Con y sin comorbilidades</option>
@@ -319,8 +487,8 @@
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <label class="form-control-label" for="edad_select${idnumber}">Selecciona el rango de edad</label>
-                                <div class="form-group" id="edad_select$${idnumber}">
+                                <label class="form-control-label" for="edad_select${idnumber}">Rango de edad</label>
+                                <div class="form-group" id="edad_select${idnumber}">
                                     <select class="custom-select">
                                       <option value="" disabled selected hidden>Selecciona el rango de edad</option>
                                       <option value="indiferente">Todos</option>
@@ -329,7 +497,8 @@
                                       <option value="60a69">De 60 a 69</option>
                                       <option value="40a49">De 40 a 49</option>
                                       <option value="50a59">De 50 a 59</option>
-                                      <option value="75a80">75 a 80</option>
+                                      <option value="20a59">De 20 a 59</option>
+                                      <option value="75a79">75 a 79</option>
                                       <option value="70a74">70 a 74</option>
                                       <option value="65a69">65 a 69</option>
                                       <option value="60a64">60 a 64</option>
@@ -339,6 +508,8 @@
                                       <option value="40a44">40 a 44</option>
                                       <option value="60ymas">Mayores de 60</option>
                                       <option value="60ymenos">Menores de 60</option>
+                                      <option value="45ymenos">Menores de 45</option>
+                                      <option value="40ymenos">Menores de 40</option>
                                     </select>
                                 </div>
                             </div>
@@ -423,10 +594,16 @@
          $('.nav-item').not('#' + toShow + "_tab").removeClass("active");
          $('#' + toShow).show();
          $('#' + toShow + "_tab").addClass("active");
+
+         if (toShow == "intro"){
+             $("#plots").hide()
+         } else {
+             $("#plots").show()
+         }
     }
 
     $( document ).ready(function() {
-        var countpanels = 1;
+
         show_div("intro");
         setsliders(Initial_Values, Ranges, suffixes);
 
@@ -440,6 +617,24 @@
           popappend(countpanels)
 
           countpanels = countpanels + 1;
+        });
+
+        $('#strategy_select').change(function() {
+            var strategy = $('#strategy_select').val();
+            switch (strategy){
+                case "UK":
+                    UK_strategy();
+                    break;
+                case "Mortalidad":
+                    mortalidad_strategy();
+                    break;
+                case "Ocupada":
+                    ocupada_strategy();
+                    break;
+                default:
+                    clean_all_pop();
+                    break;
+            }
         });
 
 
@@ -469,7 +664,7 @@
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#intro" onclick="show_div('intro');"><strong>MAPA-Vacunación</strong></a>
+        <a class="navbar-brand" href="#intro" onclick="show_div('intro');"><strong>MAPa-Vacunación</strong></a>
         <a href="javascript:void(0);" class="icon" onclick="showlinks()">
           <i class="fa fa-bars"></i>
         </a>
@@ -488,7 +683,7 @@
         </div>
     </nav>
     <div class="jumbotron navbar-content" style="height:100vh;" id = "intro">
-        <h1 class="display-3">MAPa-Vacunas COVID</h1>
+        <h1 class="display-3">MAPa-Vacunación</h1>
         <p class="lead"><strong>M</strong>odelo de <strong>A</strong>signación <strong>P</strong>rioritari<strong>a</strong> de <strong>Vacuna</strong>s para la COVID-19</p>
         <hr class="my-4">
         <div class="card-body" id = "canvasplot" style="margin-bottom: 0%;"></div>
@@ -500,6 +695,16 @@
               </p>
           </div>
       </div>
+    </div>
+    <div id = "plots">
+        <div class ="row">
+            <div class = "col-lg-6 justify-content-center">
+                <img width="75%" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Phoenicopterus_ruber_in_S%C3%A3o_Paulo_Zoo.jpg">
+            </div>
+            <div class = "col-lg-6">
+                <img width="75%" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Phoenicopterus_ruber_in_S%C3%A3o_Paulo_Zoo.jpg">
+            </div>
+        </div>
     </div>
     <div class="card navbar-content" id = "caracteristicas">
       <div class="card-header">
@@ -574,9 +779,8 @@
         <h5>Estrategias de vacunación</h5>
       </div>
       <div class="card-body">
-        <div class="container">
             <div class = "row">
-                <div class="col-lg-12">
+                <div class="col-lg-6">
                     <div class="card border-light mb-3" style="max-width: 100%;">
                         <div class="card-header">Estrategias predefinidas</div>
                         <div class="card-body">
@@ -584,13 +788,13 @@
                               <div class="row">
                                   <div class="col-lg-12">
                                       <label class="form-control-label" for="pop_select">Selecciona una estrategia de acción</label>
-                                      <div class="form-group" id="strategy_select">
-                                          <select class="custom-select">
+                                      <div class="form-group">
+                                          <select class="custom-select" id="strategy_select">
                                             <option value="" disabled selected hidden>Elige una estrategia</option>
-                                            <option value="1">Criterios de Reino Unido</option>
-                                            <option value="2">Reducción de la mortalidad</option>
-                                            <option value="3">Protección de la población ocupada</option>
-                                            <option value="4">Otra (definir)</option>
+                                            <option value="UK">Criterios de Reino Unido</option>
+                                            <option value="Mortalidad">Reducción de la mortalidad</option>
+                                            <option value="Ocupada">Protección de la población ocupada</option>
+                                            <option value="Otra">Otra (definir)</option>
                                           </select>
                                       </div>
                                   </div>
@@ -598,23 +802,23 @@
                           </div>
                       </div>
                   </div>
+                <!--<div class="jumbotron border-light" style="border: 1px; border-style: solid;">
+                    <div class = "row">
+                        <div class="offset-lg-4 col-lg-4">
+                            <button type="button" class="btn btn-primary btn-lg btn-block" id = "addpop">Agregar población</button>
+                        </div>
+                    </div>
+                </div>-->
+                <button type="button" class="btn btn-primary btn-lg btn-block" id = "addpop">Agregar población</button>
+                </div>
+          <div class="col-lg-6">
+              <div class="jumbotron border-light" style="border: 1px; border-style: solid; overflow-y: scroll; height:75vh;">
+                  <div id = "poblaciones">
+              </div>
               </div>
           </div>
-          <div id = "poblaciones">
-
           </div>
 
-          </div>
-
-          <div class="container">
-            <div class="jumbotron border-light" style="border: 1px; border-style: solid;">
-                <div class = "row">
-                    <div class="offset-lg-4 col-lg-4">
-                        <button type="button" class="btn btn-primary btn-lg btn-block" id = "addpop">Agregar población</button>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class = "row">
             <div class="offset-lg-4 col-lg-4">
                 <ul class="pagination justify-content-center">

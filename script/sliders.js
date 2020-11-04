@@ -22,7 +22,7 @@ var Initial_Values = {"pdefun": 30, "pinfect": 20, "phosp": 50, "dosis": 1, "dt"
     Ranges         = {"pdefun" : {"min": 0, "max": 100},
                       "pinfect" : {"min": 0, "max": 100},
                       "phosp" : {"min": 0, "max": 100},
-                      "dosis": {"min": 1, "max": 2},
+                      "dosis": {"min": 1, "max": 1.1},
                       "dt": {"min": 0.001, "max": 1}
                   };
     suffixes = {"pdefun": "%", "pinfect": "%", "phosp": "%", "dosis": "aplicaciones","dt": ""};
