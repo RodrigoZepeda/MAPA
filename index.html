@@ -43,9 +43,9 @@
     <!--<script src="script/jquery-ui.js"></script>  jQuery v3.5-->
     <script src="script/wNumb.min.js"></script> <!-- https://refreshless.com/wnumb/ -->
     <script src="script/nouislider.min.js"></script> <!--https://refreshless.com/nouislider/slider-values/-->
-    <!--<script src="script/sir.js"></script> Functions for running sir model-->
+    <script src="script/model.js"></script> <!--Functions for running sir model-->
     <script src="script/sliders.js"></script>
-    <!--<script src="script/plot.js"></script> Functions for plotting-->
+    <script src="script/plots.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.es.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"/>
@@ -596,9 +596,12 @@
          $('#' + toShow + "_tab").addClass("active");
 
          if (toShow == "intro"){
-             $("#plots").hide()
+             //$("#plots").hide()
+             $("#mainplot").hide()
          } else {
-             $("#plots").show()
+             //$("#plots").show()
+             $("#mainplot").show()
+             createsliders()
          }
     }
 
@@ -638,13 +641,24 @@
         });
 
 
-
-
         //Plot
         var plotparams = setPlotInit(margin, padding, xdomain, ydomain);
 
         //Initial plot
         setPlotdata(plotparams, data_init);
+
+        //New plot
+        xdomain2      = {min: 0, max: 600},
+            ydomain2      = {min: 0, max: 100.0};
+        plotparams_main = setPlotMain(margin, padding, xdomain2, ydomain2);
+
+        setPlotdataMain(plotparams_main,
+            SIR(initvalues["S0"], initvalues["V10"], initvalues["V20"],
+                initvalues["I0"], initvalues["R0"], initvalues["D10"],
+                initvalues["D20"], time = time, dt = dt,
+                theta0, theta1, theta2, phi1, phi2,
+                lambda, mu, eta, zeta, p1, p2, betaval, t0,
+                cons, periodo));
 
 
     });
@@ -696,15 +710,7 @@
           </div>
       </div>
     </div>
-    <div id = "plots">
-        <div class ="row">
-            <div class = "col-lg-6 justify-content-center">
-                <img width="75%" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Phoenicopterus_ruber_in_S%C3%A3o_Paulo_Zoo.jpg">
-            </div>
-            <div class = "col-lg-6">
-                <img width="75%" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Phoenicopterus_ruber_in_S%C3%A3o_Paulo_Zoo.jpg">
-            </div>
-        </div>
+    <div id = "mainplot">
     </div>
     <div class="card navbar-content" id = "caracteristicas">
       <div class="card-header">
@@ -715,10 +721,10 @@
           <div class="row">
             <div class="col-md-3">
                 <div class="card h-100 input-card border-light mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Dosis</div>
+                    <div class="card-header">Alcance de la vacunación</div>
                     <div class="card-body">
-                      <p class="card-text">Cantidad de aplicaciones necesarias para la vacuna.</p>
-                      <div id="dosis" class = "uislider"></div>
+                      <p class="card-text">Porcentaje de casos que reciben la vacuna</p>
+                      <div id="pcasos" class = "uislider"></div>
                     </div>
                 </div>
             </div>
@@ -733,10 +739,10 @@
             </div>
             <div class="col-md-3">
                 <div class="card h-100 input-card border-light mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Reducción en hospitalizaciones</div>
+                    <div class="card-header">Efectividad</div>
                     <div class="card-body">
-                      <p class="card-text">Porcentaje de reducción en hospitalizaciones por COVID-19.</p>
-                      <div id="phosp" class = "uislider"></div>
+                      <p class="card-text">Porcentaje de casos vacunados que no enferman de COVID.</p>
+                      <div id="pefect" class = "uislider"></div>
                     </div>
                 </div>
             </div>
@@ -749,7 +755,25 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-3">
+                <div class="card h-100 input-card border-light mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Tasa de vacunación</div>
+                    <div class="card-body">
+                      <p class="card-text">Personas vacunadas al día por cada 10 mil habitantes</p>
+                      <div id="tvac" class = "uislider"></div>
+                    </div>
+                </div>
+            </div>
           </div>
+            <!--<div class="col-md-3">
+                <div class="card h-100 input-card border-light mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Reducción en mortalidad</div>
+                    <div class="card-body">
+                      <p class="card-text">Porcentaje de reducción en defunciones por COVID-19.</p>
+                      <div id="pdefun" class = "uislider"></div>
+                    </div>
+                </div>
+            </div>-->
         </div>
         <div class = "row">
             <div class="offset-lg-4 col-lg-4">

@@ -1,33 +1,15 @@
-/*
-MIT LICENSE
-    Copyright 2018 Rodrigo Zepeda
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
-    associated documentation files (the "Software"), to deal in the Software without restriction,
-    including without limitation the rights to use, copy, modify, merge, publish, distribute,
-    sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
-    is furnished to do so, subject to the following conditions:
-    The above copyright notice and this permission notice shall be included in all copies or substantial
-    portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-    PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-    DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-
 
 //Initial values for parameters
-var Initial_Values = {"pdefun": 30, "pinfect": 20, "phosp": 50, "dosis": 1, "dt": 0.5};
-    Ranges         = {"pdefun" : {"min": 0, "max": 100},
+var Initial_Values = {"pdefun": 0.0, "pinfect": 0.0, "pcasos": 0.0, "pefect": 0.0, "dt": 0.5, "tvac": 0.03};
+    Ranges         = {"pdefun"  : {"min": 0, "max": 100},
                       "pinfect" : {"min": 0, "max": 100},
-                      "phosp" : {"min": 0, "max": 100},
-                      "dosis": {"min": 1, "max": 1.1},
-                      "dt": {"min": 0.001, "max": 1}
-                  };
-    suffixes = {"pdefun": "%", "pinfect": "%", "phosp": "%", "dosis": "aplicaciones","dt": ""};
-    stepsize = {"pdefun": 1, "pinfect": 1, "phosp": 1, "dosis": 1, "dt": 0.001};
-    decimals = {"pdefun": 0, "pinfect": 0, "phosp": 0, "dosis": 0, "dt": 3};
+                      "pcasos"  : {"min": 0, "max": 100},
+                      "pefect"  : {"min": 0, "max": 100},
+                      "dt": {"min": 0.001, "max": 1},
+                      "tvac"  : {"min": 0, "max": 10000}};
+    suffixes = {"pdefun": "%", "pinfect": "%", "pcasos": "%", "pefect": "%","dt": "", "tvac": " personas/día"};
+    stepsize = {"pdefun": 1, "pinfect": 1, "pcasos": 1, "pefect": 1, "dt": 0.001, "tvac": 1.0};
+    decimals = {"pdefun": 0, "pinfect": 0, "pcasos": 0, "pefect": 0, "dt": 3, "tvac": 0};
 
 function setsliders(Initial_Values, Ranges, suffixes){
 
@@ -50,6 +32,114 @@ function setsliders(Initial_Values, Ranges, suffixes){
             })
         });
     });
-
-
 };
+
+function createsliders(){
+
+    var vacunadosslider      = document.getElementById("pcasos");
+    var contagiosidadslider  = document.getElementById("pinfect");
+    var efectividadslider    = document.getElementById("pefect");
+    var mortalidadslider     = document.getElementById("pdefun");
+
+    vacunadosslider.noUiSlider.on('slide', function(values, handle){
+
+      var efectividadeval = efectividadslider.noUiSlider.get();
+          efectividadeval = Number(efectividadeval.substring(0, efectividadeval.length - suffixes["pefect"].length));
+
+      var vacunadosval = vacunadosslider.noUiSlider.get();
+          vacunadosval = Number(vacunadosval.substring(0, vacunadosval.length - suffixes["pcasos"].length));
+
+      var contagiosidadval = contagiosidadslider.noUiSlider.get();
+          contagiosidadval = Number(contagiosidadval.substring(0, contagiosidadval.length - suffixes["pinfect"].length));
+
+          var mortalidadval = mortalidadslider.noUiSlider.get();
+              mortalidadval = Number(mortalidadval.substring(0, mortalidadval.length - suffixes["pdefun"].length));
+
+      removePlotdata();
+
+      setPlotdataMain(plotparams_main,
+          SIR(initvalues["S0"], initvalues["V10"], initvalues["V20"],
+              initvalues["I0"], initvalues["R0"], initvalues["D10"],
+              initvalues["D20"], time = time, dt = dt,
+              theta0, theta1, theta2, efectividadeval/100*phi1, efectividadeval/100*phi2,
+              lambda, mu, eta, (100 - mortalidadval)/100*zeta, vacunadosval/100, vacunadosval/100, betaval, t0,
+              cons, periodo, contagiosidadval/100));
+
+    });
+
+    mortalidadslider.noUiSlider.on('slide', function(values, handle){
+
+      var mortalidadval = mortalidadslider.noUiSlider.get();
+          mortalidadval = Number(mortalidadval.substring(0, mortalidadval.length - suffixes["pdefun"].length));
+
+      var efectividadeval = efectividadslider.noUiSlider.get();
+          efectividadeval = Number(efectividadeval.substring(0, efectividadeval.length - suffixes["pefect"].length));
+
+      var vacunadosval = vacunadosslider.noUiSlider.get();
+          vacunadosval = Number(vacunadosval.substring(0, vacunadosval.length - suffixes["pcasos"].length));
+
+      var contagiosidadval = contagiosidadslider.noUiSlider.get();
+          contagiosidadval = Number(contagiosidadval.substring(0, contagiosidadval.length - suffixes["pinfect"].length));
+
+      removePlotdata();
+
+      setPlotdataMain(plotparams_main,
+          SIR(initvalues["S0"], initvalues["V10"], initvalues["V20"],
+              initvalues["I0"], initvalues["R0"], initvalues["D10"],
+              initvalues["D20"], time = time, dt = dt,
+              theta0, theta1, theta2, efectividadeval/100*phi1, efectividadeval/100*phi2,
+              lambda, mu, eta, (100 - mortalidadval)/100*zeta, vacunadosval/100, vacunadosval/100, betaval, t0,
+              cons, periodo, contagiosidadval/100));
+
+    });
+
+    efectividadslider.noUiSlider.on('slide', function(values, handle){
+        var mortalidadval = mortalidadslider.noUiSlider.get();
+            mortalidadval = Number(mortalidadval.substring(0, mortalidadval.length - suffixes["pdefun"].length));
+
+      var efectividadeval = efectividadslider.noUiSlider.get();
+          efectividadeval = Number(efectividadeval.substring(0, efectividadeval.length - suffixes["pefect"].length));
+
+      var vacunadosval = vacunadosslider.noUiSlider.get();
+          vacunadosval = Number(vacunadosval.substring(0, vacunadosval.length - suffixes["pcasos"].length));
+
+      var contagiosidadval = contagiosidadslider.noUiSlider.get();
+          contagiosidadval = Number(contagiosidadval.substring(0, contagiosidadval.length - suffixes["pinfect"].length));
+
+      removePlotdata();
+
+      setPlotdataMain(plotparams_main,
+          SIR(initvalues["S0"], initvalues["V10"], initvalues["V20"],
+              initvalues["I0"], initvalues["R0"], initvalues["D10"],
+              initvalues["D20"], time = time, dt = dt,
+              theta0, theta1, theta2, efectividadeval/100*phi1, efectividadeval/100*phi2,
+              lambda, mu, eta, (100 - mortalidadval)/100*zeta, vacunadosval/100, vacunadosval/100, betaval, t0,
+              cons, periodo, contagiosidadval/100));
+
+    });
+
+    contagiosidadslider.noUiSlider.on('slide', function(values, handle){
+        var mortalidadval = mortalidadslider.noUiSlider.get();
+            mortalidadval = Number(mortalidadval.substring(0, mortalidadval.length - suffixes["pdefun"].length));
+
+     var vacunadosval = vacunadosslider.noUiSlider.get();
+        vacunadosval = Number(vacunadosval.substring(0, vacunadosval.length - suffixes["pcasos"].length));
+
+     var efectividadeval = efectividadslider.noUiSlider.get();
+         efectividadeval = Number(efectividadeval.substring(0, efectividadeval.length - suffixes["pefect"].length));
+
+      var contagiosidadval = contagiosidadslider.noUiSlider.get();
+          contagiosidadval = Number(contagiosidadval.substring(0, contagiosidadval.length - suffixes["pinfect"].length));
+
+      removePlotdata();
+
+      setPlotdataMain(plotparams_main,
+          SIR(initvalues["S0"], initvalues["V10"], initvalues["V20"],
+              initvalues["I0"], initvalues["R0"], initvalues["D10"],
+              initvalues["D20"], time = time, dt = dt,
+              theta0, theta1, theta2, efectividadeval/100*phi1, efectividadeval/100*phi2,
+              lambda, mu, eta, (100 - mortalidadval)/100*zeta, vacunadosval/100, vacunadosval/100, betaval, t0,
+              cons, periodo, contagiosidadval/100));
+
+    });
+}
